@@ -1,3 +1,5 @@
+using OXGameV1;
+using System.Numerics;
 using System.Windows.Forms;
 
 namespace OXGame
@@ -5,83 +7,75 @@ namespace OXGame
     public partial class Form1 : Form
     {
         //
-        String playerMarker = "X";
+        OXGameEngine engine = new OXGameEngine();
+        private Button[,] buttons;
+        private char playerMarker = 'X';
 
         //
         public Form1()
         {
             InitializeComponent();
+            //
+            InitializeGame();
+            //
+            engine.ResetGame();
         }
 
-        private void label1_Click(object sender, EventArgs e)
+        private void InitializeGame()
         {
-
+            buttons = new Button[3, 3];
+            // construct 3*3 Button with for loop
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    // Create Button object and initialize the attributes
+                    Button button = new Button();
+                    button.Font = new Font("Arial", 32F);
+                    button.Size = new Size(90, 90);
+                    button.Tag = String.Format("{0},{1}", i, j);
+                    button.Location = new Point(10 + j * 100, 10 + i * 100);
+                    // += : bind the event-handler to button¡¦s Click-event
+                    button.Click += new EventHandler(Button_Click);
+                    // ¬Ù²¤ new EventHandler(¡K) ¤]OK „» += Button_Click;
+                    // Record the button with 2-D Array
+                    buttons[i, j] = button;
+                    // Add button object to the internal area of Form
+                    Controls.Add(button);
+                }
+            }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void Button_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void Form1_Load_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            // Casting sender to be a Button
+            // Cast the sender to be Button object !
             Button button = (Button)sender;
-            // Á×§K¤U²Ä¤G¦¸!
-            if (button.Text != "")
+            //
+            String posTag = (String)button.Tag;
+            String[] xy = posTag.Split(',');
+            int x = int.Parse(xy[0]);
+            int y = int.Parse(xy[1]);
+            //
+            if (engine.GetMarker(x, y) != ' ')
                 return;
             //
-            button.Text = playerMarker;
-            
-            playerMarker = playerMarker == "X" ? "O" : "X";
-            label2.Text = playerMarker;
+            engine.SetMarker(x, y, playerMarker);
+            button.Text = "" + playerMarker;
+            //
+            playerMarker = (playerMarker == 'X') ? 'O' : 'X';
+            label2.Text = "" + playerMarker;
             //
             checkWinner();
+
         }
+
 
         private void checkWinner()
         {
-            // 
-            if (button1.Text == button2.Text && button2.Text == button3.Text && button1.Text !=" " )
+            char winner = engine.IsWinner();
+            if (engine.IsWinner() != ' ')
             {
-                MessageBox.Show(button1.Text, "Winner is...");
-            }
-            else if (button4.Text == button5.Text && button5.Text == button6.Text && button4.Text != " ")
-            {
-                MessageBox.Show(button4.Text, "Winner is...");
-            }
-            else if (button7.Text == button8.Text && button8.Text == button9.Text && button7.Text != " ")
-            {
-                MessageBox.Show(button7.Text, "Winner is...");
-            }
-            else if (button1.Text == button4.Text && button4.Text == button7.Text && button1.Text != " ")
-            {
-                MessageBox.Show(button1.Text, "Winner is...");
-            }
-            else if (button2.Text == button5.Text && button5.Text == button8.Text && button2.Text != " ")
-            {
-                MessageBox.Show(button2.Text, "Winner is...");
-            }
-            else if (button3.Text == button6.Text && button6.Text == button9.Text && button3.Text != " ")
-            {
-                MessageBox.Show(button3.Text, "Winner is...");
-            }
-            else if (button1.Text == button5.Text && button5.Text == button9.Text && button1.Text != " ")
-            {
-                MessageBox.Show(button1.Text, "Winner is...");
-            }
-            else if (button3.Text == button5.Text && button5.Text == button7.Text && button3.Text != " ")
-            {
-                MessageBox.Show(button3.Text, "Winner is...");
-            }
-            else
-            {
-                // check if TIE ?
+                MessageBox.Show("Winner is: " + winner);
             }
         }
     }
